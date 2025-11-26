@@ -98,7 +98,7 @@ show(mirror_mount)
 # %%
 
 stage_mount_depth = 5.0*MM
-m3_nut_radius = 3.0*MM
+m3_nut_radius = 3.2*MM
 m3_nut_depth = 2*MM
 stage_mount_bottom_size = 8*MM
 stage_mount_right_size = 8*MM
@@ -152,4 +152,8 @@ show(stage_mount)
 # %%
 # Pack and export files
 show(pack([stage_mount.part, mirror_mount.part], padding=5*MM))
-export_stl(mirror_mount.part, "stl/kinematic_mirror_mount.stl")
+export_stl(mirror_mount.part, "stl/kinematic_mirror_mount/mirror_mount.stl")
+export_stl(stage_mount.part, "stl/kinematic_mirror_mount/stage_mount.stl")
+
+export_step(mirror_mount.part, "step/kinematic_mirror_mount/mirror_mount.step")
+export_step(stage_mount.part, "step/kinematic_mirror_mount/stage_mount.step")
