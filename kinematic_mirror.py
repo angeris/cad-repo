@@ -150,10 +150,5 @@ with BuildPart() as stage_mount:
 show(stage_mount)
 
 # %%
-# Pack and export files
-show(pack([stage_mount.part, mirror_mount.part], padding=5*MM))
-export_stl(mirror_mount.part, "stl/kinematic_mirror_mount/mirror_mount.stl")
-export_stl(stage_mount.part, "stl/kinematic_mirror_mount/stage_mount.stl")
-
 export_step(mirror_mount.part, "step/kinematic_mirror_mount/mirror_mount.step")
 export_step(stage_mount.part, "step/kinematic_mirror_mount/stage_mount.step")
