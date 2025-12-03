@@ -36,4 +36,7 @@ with BuildPart() as knife_holder_spacer:
 show(knife_holder_spacer)
 
 # %%
-export_step(knife_holder_spacer.part, "step/knife_holder_spacer/knife_holder_spacer.step")
+show(knife_holder_spacer)
+save_screenshot("knife_holder_spacer/knife_holder_spacer.png")
+
+export_step(knife_holder_spacer.part, "knife_holder_spacer/knife_holder_spacer.step")

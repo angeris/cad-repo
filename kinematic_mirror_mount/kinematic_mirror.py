@@ -151,5 +151,10 @@ with BuildPart() as stage_mount:
 show(stage_mount)
 
 # %%
-export_step(mirror_mount.part, "step/kinematic_mirror_mount/mirror_mount.step")
-export_step(stage_mount.part, "step/kinematic_mirror_mount/stage_mount.step")
+packed_mount = pack([mirror_mount.part, stage_mount.part], padding=5*MM)
+show(packed_mount)
+save_screenshot("kinematic_mirror_mount/kinematic_mirror_mount.png")
+
+export_step(mirror_mount.part, "kinematic_mirror_mount/mirror_mount.step")
+export_step(stage_mount.part, "kinematic_mirror_mount/stage_mount.step")
+# %%
