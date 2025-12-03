@@ -8,8 +8,8 @@ set_defaults(reset_camera=Camera.CENTER, helper_scale=5)
 # %%
 
 mirror_mount_depth = 5*MM
-mount_width = 45*MM
-mount_height = 45*MM
+mount_width = 35*MM
+mount_height = 35*MM
 
 mirror_side_length = 25.5*MM
 mirror_depth = 1.8*MM
@@ -51,12 +51,15 @@ with BuildPart() as mirror_mount:
 
     with BuildSketch(top_face) as rod_holders:
         bottom_left_vertex = top_face.vertices().group_by(Axis.Y)[0][0]
-        with Locations(bottom_left_vertex + (spring_hole_margin_left, spring_hole_margin_bottom, 0)):
-            Rectangle(spring_hole_length, spring_hole_width, align=(Align.MIN, Align.MIN))
-    
         bottom_right_vertex = top_face.vertices().group_by(Axis.Y)[0][-1]
-        with Locations(bottom_right_vertex + (-spring_hole_margin_right, spring_hole_margin_bottom, 0)):
-            Rectangle(spring_hole_length, spring_hole_width, align=(Align.MAX, Align.MIN))
+
+        midpoint_bottom = ShapeList([bottom_left_vertex, bottom_right_vertex]).center()
+
+        with Locations(midpoint_bottom + (0, spring_hole_margin_bottom, 0)):
+            Rectangle(spring_hole_length, spring_hole_width, align=(Align.CENTER, Align.MIN))
+    
+        # with Locations(bottom_right_vertex + (-spring_hole_margin_right, spring_hole_margin_bottom, 0)):
+        #     Rectangle(spring_hole_length, spring_hole_width, align=(Align.MAX, Align.MIN))
 
         # Create diagonal plane from top left to bottom right
         diagonal_plane = Plane(
@@ -74,9 +77,7 @@ with BuildPart() as mirror_mount:
         
     extrude(amount=-mirror_mount_depth, mode=Mode.SUBTRACT)
 
-    print(bottom_right_vertex.center())
     top_right_vertex = top_face.vertices().group_by(Axis.Y)[-1][-1]
-    print(top_right_vertex.center())
     with BuildSketch(bottom_face) as screw_holes:
         with Locations([top_left_vertex + (screw_hole_margin_side, -screw_hole_margin_bottom, 0),
                         bottom_right_vertex + (-screw_hole_margin_side, screw_hole_margin_bottom, 0),
