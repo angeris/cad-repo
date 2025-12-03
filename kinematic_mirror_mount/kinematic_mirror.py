@@ -18,9 +18,9 @@ mirror_margin = 2.0*MM
 
 spring_hole_width = 4.0*MM
 spring_hole_length = 12.0*MM
-spring_hole_through_length = 8.0*MM
+spring_hole_through_length = 6.0*MM
 
-rod_diameter = 2.0*MM
+rod_diameter = 3.0*MM
 
 spring_hole_margin_bottom = 2.0*MM
 spring_hole_margin_left = 8.0*MM
@@ -28,7 +28,7 @@ spring_hole_margin_right = 8.0*MM
 
 screw_hole_margin_side = 4.0*MM
 screw_hole_margin_bottom = spring_hole_margin_bottom + spring_hole_width/2
-screw_hole_diameter = 3.6*MM
+screw_hole_diameter = 3.2*MM
 screw_hole_depth = 1.00*MM
 
 fillet_radius_outside = 5.0*MM
@@ -58,9 +58,6 @@ with BuildPart() as mirror_mount:
         with Locations(midpoint_bottom + (0, spring_hole_margin_bottom, 0)):
             Rectangle(spring_hole_length, spring_hole_width, align=(Align.CENTER, Align.MIN))
     
-        # with Locations(bottom_right_vertex + (-spring_hole_margin_right, spring_hole_margin_bottom, 0)):
-        #     Rectangle(spring_hole_length, spring_hole_width, align=(Align.MAX, Align.MIN))
-
         # Create diagonal plane from top left to bottom right
         diagonal_plane = Plane(
             origin=(0,0,0),
@@ -152,9 +149,8 @@ show(stage_mount)
 
 # %%
 packed_mount = pack([mirror_mount.part, stage_mount.part], padding=5*MM)
-show(packed_mount)
+show(packed_mount, reset_camera=Camera.RESET, axes=False, grid=False)
 save_screenshot("kinematic_mirror_mount/kinematic_mirror_mount.png")
 
 export_step(mirror_mount.part, "kinematic_mirror_mount/mirror_mount.step")
 export_step(stage_mount.part, "kinematic_mirror_mount/stage_mount.step")
-# %%
