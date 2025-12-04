@@ -31,7 +31,7 @@ screw_hole_margin_bottom = spring_hole_margin_bottom + spring_hole_width/2
 screw_hole_diameter = 3.2*MM
 screw_hole_depth = 1.00*MM
 
-fillet_radius_outside = 5.0*MM
+fillet_radius_outside = 4.0*MM
 
 
 with BuildPart() as mirror_mount:
@@ -46,6 +46,8 @@ with BuildPart() as mirror_mount:
         top_left_vertex_margin = top_left_vertex + (mirror_margin, -mirror_margin, 0)
         with Locations(top_left_vertex_margin):
             mirror_hole_rect = Rectangle(mirror_side_length, mirror_side_length, align=(Align.MIN, Align.MAX))
+
+        mirror_midpoint = mirror_hole_rect.vertices().center()
 
     extrude(amount=-mirror_depth, mode=Mode.SUBTRACT)
 
@@ -79,9 +81,12 @@ with BuildPart() as mirror_mount:
         with Locations([top_left_vertex + (screw_hole_margin_side, -screw_hole_margin_bottom, 0),
                         bottom_right_vertex + (-screw_hole_margin_side, screw_hole_margin_bottom, 0),
                         top_right_vertex + (-screw_hole_margin_side, -screw_hole_margin_bottom, 0)]):
-            Circle(screw_hole_diameter/2)
-        
+            holes = Circle(screw_hole_diameter/2)
     extrude(amount=-screw_hole_depth, mode=Mode.SUBTRACT)
+        
+    # Create a mid line at the "true" bottom of the mount for projecting
+    # the mount point.
+    mid_line = Pos(0, 0, -mirror_mount_depth/2) * Line([bottom_left_vertex, bottom_right_vertex])
 
     bottom_face_screw_holes = mirror_mount.faces().sort_by(Axis.Z).first.edges().filter_by(GeomType.CIRCLE)
     chamfer(bottom_face_screw_holes, length=.8*MM)
@@ -91,7 +96,7 @@ with BuildPart() as mirror_mount:
     z_edges.remove(top_left_edge)
     fillet(z_edges, radius=fillet_radius_outside)
 
-show(mirror_mount)
+show(mirror_mount, render_joints=True)
 
 # %%
 
@@ -135,6 +140,10 @@ with BuildPart() as stage_mount:
 
     extrude(amount=-stage_mount_depth, mode=Mode.SUBTRACT)
 
+    mount_face = stage_mount.faces().filter_by(Plane.ZY).sort_by(Axis.X).last
+    mount_point = mount_face.vertices().center()
+    RigidJoint(label="mount_point", joint_location=Location(mount_point, (90, 270, 0)))
+
     z_edges = stage_box.edges().filter_by(Axis.Z)
     fillet(z_edges, radius=fillet_radius_outside)
 
@@ -145,12 +154,13 @@ with BuildPart() as stage_mount:
     top_right_cutout_edge = stage_mount.edges().filter_by(Axis.Z).group_by(Axis.Y)[-1][0]
     fillet([bottom_left_cutout_edge, top_right_cutout_edge], radius=fillet_radius_inside)
 
-show(stage_mount)
+show([stage_mount], render_joints=True)
 
 # %%
 packed_mount = pack([mirror_mount.part, stage_mount.part], padding=5*MM)
-show(packed_mount, reset_camera=Camera.RESET, axes=False, grid=False)
+show(packed_mount, reset_camera=Camera.RESET, axes=False, grid=False, transparent=False)
 save_screenshot("kinematic_mirror_mount/kinematic_mirror_mount.png")
 
 export_step(mirror_mount.part, "kinematic_mirror_mount/mirror_mount.step")
 export_step(stage_mount.part, "kinematic_mirror_mount/stage_mount.step")
+
