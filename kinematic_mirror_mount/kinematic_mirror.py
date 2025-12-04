@@ -33,6 +33,9 @@ screw_hole_depth = 1.00*MM
 
 fillet_radius_outside = 4.0*MM
 
+m3_screw_depth = 6.0*MM
+m3_collar_height = 3*MM
+
 
 with BuildPart() as mirror_mount:
     mount_box = Box(mount_width, mount_height, mirror_mount_depth)
@@ -83,11 +86,11 @@ with BuildPart() as mirror_mount:
                         top_right_vertex + (-screw_hole_margin_side, -screw_hole_margin_bottom, 0)]):
             holes = Circle(screw_hole_diameter/2)
     extrude(amount=-screw_hole_depth, mode=Mode.SUBTRACT)
-        
-    # Create a mid line at the "true" bottom of the mount for projecting
-    # the mount point.
-    mid_line = Pos(0, 0, -mirror_mount_depth/2) * Line([bottom_left_vertex, bottom_right_vertex])
 
+    # As viewed from the top face, bottom right screw hole
+    bottom_right_screw_hole = screw_holes.sketch.faces().sort_by_distance(bottom_right_vertex)[0].center()
+    RigidJoint(label="stage_mount_point", joint_location=Location(bottom_right_screw_hole, (0, 0, 0)))
+        
     bottom_face_screw_holes = mirror_mount.faces().sort_by(Axis.Z).first.edges().filter_by(GeomType.CIRCLE)
     chamfer(bottom_face_screw_holes, length=.8*MM)
 
@@ -96,7 +99,7 @@ with BuildPart() as mirror_mount:
     z_edges.remove(top_left_edge)
     fillet(z_edges, radius=fillet_radius_outside)
 
-show(mirror_mount, render_joints=True)
+show([mirror_mount, bottom_right_screw_hole], render_joints=True)
 
 # %%
 
@@ -136,9 +139,11 @@ with BuildPart() as stage_mount:
         with Locations(top_left_vertex):
             rect = Rectangle(mount_width - stage_mount_right_size, mount_height - stage_mount_bottom_size, align=(Align.MIN, Align.MAX))
     
-    bottom_right_cutout_vertex = rect.vertices().group_by(Axis.X)[-1][0]
-
     extrude(amount=-stage_mount_depth, mode=Mode.SUBTRACT)
+
+    bottom_right_cutout_vertex = rect.vertices().group_by(Axis.X)[-1][0]
+    bottom_right_screw_hole = m3_nut_holes.sketch.faces().sort_by_distance(bottom_right_vertex)[0].center()
+    RigidJoint(label="mirror_mount", joint_location=Location(bottom_right_screw_hole, (0,0,0)))
 
     mount_face = stage_mount.faces().filter_by(Plane.ZY).sort_by(Axis.X).last
     mount_point = mount_face.vertices().center()
@@ -154,7 +159,12 @@ with BuildPart() as stage_mount:
     top_right_cutout_edge = stage_mount.edges().filter_by(Axis.Z).group_by(Axis.Y)[-1][0]
     fillet([bottom_left_cutout_edge, top_right_cutout_edge], radius=fillet_radius_inside)
 
-show([stage_mount], render_joints=True)
+show([stage_mount, bottom_right_screw_hole], render_joints=True)
+
+# %%
+# Basic assembly
+stage_mount.part.joints["mirror_mount"].connect_to(mirror_mount.part.joints["stage_mount_point"])
+show([mirror_mount, stage_mount], render_joints=True)
 
 # %%
 packed_mount = pack([mirror_mount.part, stage_mount.part], padding=5*MM)
