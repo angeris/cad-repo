@@ -3,7 +3,6 @@ import copy
 from build123d import *
 from ocp_vscode import *
 
-from kinematic_mirror_mount.kinematic_mirror import mount_height, mirror_side_length, mirror_margin
 from michelson_interferometer.beam_splitter_mount import beam_splitter_mount_height
 
 set_defaults(reset_camera=Camera.CENTER, helper_scale=5)
@@ -16,7 +15,7 @@ laser_mount_thickness = 1.0*MM
 laser_notch_diameter = 4*MM
 laser_notch_depth = 1*MM
 
-pole_height = beam_splitter_mount_height + laser_diameter/2
+pole_height = beam_splitter_mount_height + laser_notch_diameter/2
 pole_diameter = 3*MM
 
 # Height above center at which to create notch
