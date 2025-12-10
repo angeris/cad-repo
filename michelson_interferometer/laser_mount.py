@@ -10,10 +10,10 @@ set_defaults(reset_camera=Camera.CENTER, helper_scale=5)
 # %%
 
 laser_diameter = 6.0*MM
-laser_depth = 10*MM
+laser_depth = 5*MM
 laser_mount_thickness = 1.0*MM
 laser_notch_diameter = 4*MM
-laser_notch_depth = 1*MM
+laser_notch_depth = .3*MM
 
 pole_height = beam_splitter_mount_height + laser_notch_diameter/2
 pole_diameter = 3*MM
@@ -24,10 +24,14 @@ split_height = 1*MM
 laser_mount_base = Cylinder(pole_diameter/2, pole_height)
 laser_mount_base += Pos(0, 0, pole_height/2) * Rot(0, 90, 0) * (Cylinder(laser_diameter/2 + laser_mount_thickness, laser_depth))
 
+laser_mount_base = Box(laser_depth, pole_diameter, pole_height)
+laser_mount_cyl = Pos(0, 0, pole_height/2) * Rot(0, 90, 0) * (Cylinder(laser_diameter/2 + laser_mount_thickness, laser_depth))
+laser_mount_base += laser_mount_cyl
+
 with BuildPart() as laser_mount:
     add(laser_mount_base)
 
-    front_face = laser_mount.faces().sort_by(Axis.X).last
+    front_face = laser_mount_cyl.faces().sort_by(Axis.X).last
 
     with BuildSketch(front_face):
         Circle(laser_notch_diameter/2)
@@ -50,3 +54,6 @@ with BuildPart() as laser_mount:
     )
 
 show(laser_mount, render_joints=True)
+
+# %%
+export_step(laser_mount.part, "michelson_interferometer/test_parts/laser_mount.step")

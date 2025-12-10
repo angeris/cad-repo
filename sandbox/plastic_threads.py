@@ -13,8 +13,8 @@ thread_size = "M38SP444"
 external_threads = PlasticBottleThread(thread_size, external=True)
 neck_radius = external_threads.root_radius
 
-external_cylinder = Cylinder(neck_radius+0.001*MM, external_threads.length + 2*MM, align=(Align.CENTER, Align.CENTER, Align.MIN))
-male_thread = Rot(0, 0, 180) * Rot(180, 0, 0) * (external_cylinder + external_threads)
+external_cylinder = Cylinder(neck_radius+0.001*MM, external_threads.length, align=(Align.CENTER, Align.CENTER, Align.MIN))
+male_thread = Rot(180, 0, 0) * (external_cylinder + external_threads)
 
 internal_threads = PlasticBottleThread(thread_size, external=False)
 
@@ -32,5 +32,5 @@ with BuildPart() as female_thread:
 
 show(female_thread.part, Pos(0, 0, -10)* male_thread)
 
-export_step(female_thread.part, "sandbox/female_threads.step")
+export_step(Rot(180, 0, 0) * female_thread.part, "sandbox/female_threads.step")
 export_step(male_thread, "sandbox/male_threads.step")

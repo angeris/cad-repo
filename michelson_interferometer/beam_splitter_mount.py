@@ -8,7 +8,7 @@ from kinematic_mirror_mount.kinematic_mirror import mount_height, mirror_side_le
 set_defaults(reset_camera=Camera.CENTER, helper_scale=5)
 
 # %%
-beam_splitter_side_length = 10*MM
+beam_splitter_side_length = 15.2*MM
 beam_splitter_mount_thickness = 2.0*MM
 beam_splitter_mount_height = mount_height - mirror_side_length - mirror_margin
 
@@ -39,3 +39,5 @@ with BuildPart() as beam_splitter_mount:
     )
 
 show(beam_splitter_mount, render_joints=True)
+export_step(beam_splitter_mount.part, "michelson_interferometer/test_parts/beam_splitter_mount.step")
+# %%

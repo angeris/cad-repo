@@ -1,11 +1,14 @@
 # %%
+# %load_ext autoreload
+# %autoreload 2
+
 import copy
 from build123d import *
 from ocp_vscode import *
 
 from kinematic_mirror_mount.kinematic_mirror import mirror_mount, stage_mount, mirror_mount_depth, mount_width
 from michelson_interferometer.beam_splitter_mount import beam_splitter_mount
-from michelson_interferometer.laser_mount import laser_mount, pole_diameter
+from michelson_interferometer.laser_mount import laser_mount, laser_depth
 
 set_defaults(reset_camera=Camera.KEEP, helper_scale=5)
 
@@ -42,7 +45,7 @@ with BuildPart() as base_board:
         joint_location=Location(beam_splitter_location)
     )
 
-    laser_mount_location = laser_mount_edge @ .5 + (-pole_diameter/2, 0, 0)
+    laser_mount_location = laser_mount_edge @ .5 + (-laser_depth/2, 0, 0)
     RigidJoint(
         label="laser_mount",
         joint_location=Location(laser_mount_location, 180)
@@ -112,3 +115,5 @@ complete_assembly = Compound(
 
 show(Rot(0, 0, 270) * complete_assembly)
 save_screenshot("michelson_interferometer/complete_assembly.png")
+
+# %%
